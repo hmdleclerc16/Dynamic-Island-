@@ -247,6 +247,8 @@ fun CompactContent(act: Act, s: IslandSettings, wideWidth: Dp) {
 
         is Act.AlarmA -> AlarmCompact(act.a, s)
 
+        is Act.ShelfA -> ShelfCompact(act.items, s)
+
         is Act.NoticeA -> NoticeCompact(act.n, s, wideWidth)
 
         is Act.PayA -> PayReady(tr("Оплата", "Pay"), tr("К терминалу", "Hold near reader"), act.p.icon, s, wideWidth)

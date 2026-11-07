@@ -57,6 +57,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Inbox
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -103,6 +105,7 @@ import com.akira.island.data.Elasticity
 import com.akira.island.data.ExpandStyle
 import com.akira.island.data.IslandSettings
 import com.akira.island.data.SettingsRepo
+import com.akira.island.data.ShelfRepo
 import com.akira.island.data.TapAction
 import com.akira.island.service.CallMonitor
 import com.akira.island.service.NavScreen
@@ -156,6 +159,7 @@ fun IslandOverlay(
     val nextAlarm by IslandBus.nextAlarm.collectAsState()
     val egg by IslandBus.egg.collectAsState()
     val payReady by IslandBus.payReady.collectAsState()
+    val shelf by ShelfRepo.items.collectAsState()
     // Будильник появляется в острове за 12 часов и уходит, когда прозвенел: просыпаемся ровно в эти два момента,
     // а не каждые полминуты. Пока телефон спит, ожидание стоит — поэтому со включением экрана пересчитываем
     val screenOn by IslandBus.screenOn.collectAsState()
@@ -242,6 +246,8 @@ fun IslandOverlay(
         // Будильник — тише всех: показывается, только когда больше ничего нет, и не уходит в пузырь
         val alarm = nextAlarm
         if (s.cardAlarm && alarm != null && alarm.triggerAt - alarmNow in 1..ALARM_LEAD_MS) persistent += Act.AlarmA(alarm)
+        // Полка тоже тихая: когда есть другая активность, она уходит в пузырь, а нажатие на пузырь раскрывает её
+        if (s.cardShelf && shelf.isNotEmpty()) persistent += Act.ShelfA(shelf)
 
         // Выбранная активность выходит вперёд, но звонящий таймер всегда главный
         val ringing = (persistent.firstOrNull() as? Act.TimerA)?.t?.ringing == true || call?.incoming == true
@@ -861,6 +867,7 @@ private fun Bubble(act: Act, s: IslandSettings) {
             is Act.CallA -> Icon(Ios.call, null, tint = Tints.Green, modifier = Modifier.size(inner * 0.7f))
             is Act.LiveA -> LiveGlyph(act.l, inner, liveTint(act.l.kind))
             is Act.ChargingA -> Icon(Ios.flash, null, tint = Tints.Green, modifier = Modifier.size(inner * 0.7f))
+            is Act.ShelfA -> Icon(Icons.Rounded.Inbox, null, tint = Tints.Teal, modifier = Modifier.size(inner * 0.8f))
             else -> Unit
         }
     }

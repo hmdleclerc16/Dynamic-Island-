@@ -12,6 +12,7 @@ import com.akira.island.core.ProgressInfo
 import com.akira.island.core.StopwatchState
 import com.akira.island.core.TimerState
 import com.akira.island.core.TorchState
+import com.akira.island.data.ShelfItem
 
 /** То, что сейчас может показывать остров. Короткие (transient) не раскрываются и не уходят в пузырь. */
 sealed class Act(val id: String, val transient: Boolean = false) {
@@ -45,4 +46,6 @@ sealed class Act(val id: String, val transient: Boolean = false) {
     data class AlarmA(val a: AlarmInfo) : Act("alarm") {
         override val pkg: String? get() = a.pkg
     }
+    /** Полка: текст и фото, которые положили в остров, чтобы забрать позже */
+    data class ShelfA(val items: List<ShelfItem>) : Act("shelf")
 }
